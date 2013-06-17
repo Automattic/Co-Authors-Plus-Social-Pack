@@ -55,9 +55,6 @@ class CoAuthors_Plus_Social_Pack {
 		if ( ! $this->coauthors_plus instanceof coauthors_plus || ! $this->coauthors_plus->guest_authors instanceof CoAuthors_Guest_Authors )
 			return;
 
-		// Don't need the Sharing metabox added by Jetpack
-		remove_meta_box( 'social_meta', $this->coauthors_plus->guest_authors->post_type, 'normal' );
-
 		if ( get_post_type() == $this->coauthors_plus->guest_authors->post_type )
 			add_meta_box( 'coauthors-manage-guest-author-social', __( 'Social', 'co-authors-plus' ), array( $this, 'metabox_manage_guest_author_social' ), $this->coauthors_plus->guest_authors->post_type, 'normal', 'default' );
 	}
