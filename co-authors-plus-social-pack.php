@@ -180,6 +180,18 @@ class CoAuthors_Plus_Social_Pack {
 				'disabled'			=> $sharing_disabled,
 				'sanitize_function'	=> 'intval'
 			);
+
+			$fields_to_return['facebook'] = array(
+				'key'      			=> 'facebook',
+				'label'    			=> __( 'Facebook', 'co-authors-plus' ),
+				'group'    			=> 'social'
+			);
+
+			$fields_to_return['google_plus'] = array(
+				'key'      			=> 'google_plus',
+				'label'    			=> __( 'Google+', 'co-authors-plus' ),
+				'group'    			=> 'social'
+			);
 		}
 
 		return apply_filters( 'coauthors_social_fields', $fields_to_return );
