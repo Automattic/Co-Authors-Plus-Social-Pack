@@ -244,9 +244,11 @@ class CoAuthors_Plus_Social_Pack {
 
 $coauthors_plus_social_pack;
 
-// Must come in init, so Co Authors Plus is guaranteed to be already instantiated
-add_action( 'init', function() {
+function coauthors_plus_social_pack_init() {
 	global $coauthors_plus_social_pack;
 
 	$coauthors_plus_social_pack = new CoAuthors_Plus_Social_Pack();
-} );
+}
+
+// Must come in init, so Co Authors Plus is guaranteed to be already instantiated
+add_action( 'init', 'coauthors_plus_social_pack_init' );
