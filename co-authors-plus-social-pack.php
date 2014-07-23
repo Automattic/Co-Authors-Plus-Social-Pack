@@ -115,7 +115,7 @@ class CoAuthors_Plus_Social_Pack {
 	 */
 	public function filter_jetpack_sharing_twitter_related( $related, $post_id ) {
 		if ( ! function_exists( 'get_coauthors' ) )
-			return $via;
+			return $related;
 
 		$coauthors = get_coauthors( $post_id );
 
