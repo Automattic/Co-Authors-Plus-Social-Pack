@@ -40,18 +40,20 @@ class CoAuthors_Plus_Social_Pack {
 			add_action( 'admin_notices', array( $this, 'action_admin_notices_missing_coauthors_plus' ) );
 		}
 
-		add_filter( 'jetpack_sharing_twitter_via', 		array( $this, 'filter_jetpack_sharing_twitter_via' ), 		10, 2 );
-		add_filter( 'jetpack_sharing_twitter_related', 	array( $this, 'filter_jetpack_sharing_twitter_related' ), 	10, 2 );
+		add_filter( 'jetpack_sharing_twitter_via', 		           array( $this, 'filter_jetpack_sharing_twitter_via' ), 		10, 2 );
+		add_filter( 'jetpack_sharing_twitter_related', 	           array( $this, 'filter_jetpack_sharing_twitter_related' ), 	10, 2 );
 
-		add_filter( 'coauthors_guest_author_fields', 	array( $this, 'filter_coauthors_guest_author_fields' ), 	10, 2 );
+		add_filter( 'coauthors_guest_author_fields', 	           array( $this, 'filter_coauthors_guest_author_fields' ), 	    10, 2 );
 
-		add_action( 'add_meta_boxes', 					array( $this, 'action_add_meta_boxes' ), 					20, 2 );
+		add_action( 'add_meta_boxes', 					           array( $this, 'action_add_meta_boxes' ), 					20, 2 );
+
+        add_filter( 'coauthors_guest_authors_exported_extra_data', array( $this, 'filter_export_extra_data' ),                  10, 2 );
 	}
 
 	/**
 	 * Register the metaboxes used for Guest Authors Social settings
 	 */
-	function action_add_meta_boxes() {		
+	function action_add_meta_boxes() {
 		if ( ! $this->coauthors_plus instanceof coauthors_plus || ! $this->coauthors_plus->guest_authors instanceof CoAuthors_Guest_Authors )
 			return;
 
@@ -78,7 +80,7 @@ class CoAuthors_Plus_Social_Pack {
 	 *
 	 * We can do better - this (optionally) will attribute the Tweet to the first co author with a Twitter username and the setting
 	 * enabled
-	 * 
+	 *
 	 * @param  string $via The Twitter username to label the Tweet as 'from'
 	 * @param  int $post_id The post id for the post being shared
 	 * @return string The Twitter username to use in 'via' instead
@@ -108,7 +110,7 @@ class CoAuthors_Plus_Social_Pack {
 	 *
 	 * Once a post is shared to Twitter, Twitter presents the user with a list of Related/Recommended accounts - this filter
 	 * gives us the ability to tell Twitter exactly which accounts to suggest - in this case, the post's Authors
-	 * 
+	 *
 	 * @param  array $related Array of related Twitter usernames
 	 * @param  int $post_id The id of the post being shared
 	 * @return array The array of Twitter usernames to suggest as related / recommended
@@ -135,7 +137,7 @@ class CoAuthors_Plus_Social_Pack {
 	/**
 	 * Hook into Co Authors Plus's filter_coauthors_guest_author_fields to add new fields
 	 * to the Guest Author (profile) edit page
-	 * 
+	 *
 	 * @param  array $fields_to_return The current Guest Author fields
 	 * @param  array $groups           The field groups
 	 * @return array                   The filtered array of fields
@@ -198,6 +200,42 @@ class CoAuthors_Plus_Social_Pack {
 	}
 
 	/**
+	 * Hook into Co Authors Plus's filter coauthors_guest_authors_exported_extra_data to extra fields
+	 * to exported personal data
+	 *
+	 * @param  array $data      Data to be exported
+	 * @param  array $author_id The guest author ID
+	 * @return array            The extra data to be exported
+	 */
+	function filter_export_extra_data( $data, $author_id ) {
+		$fields = $this->coauthors_plus->guest_authors->get_guest_author_fields( 'social' );
+		$ignore_fields = array(
+			'enable_twitter_via',
+			'enable_twitter_related',
+		);
+
+		if ( ! is_array( $data ) ) {
+			$data = [];
+		}
+
+		foreach( $fields as $field ) {
+			if ( in_array( $field['key'], $ignore_fields ) ) continue;
+
+			$key = $this->coauthors_plus->guest_authors->get_post_meta_key( $field['key'] );
+			$value = get_post_meta( $author_id, $key, true );
+
+			if ( empty( $value ) ) continue;
+
+			$data[] = array(
+				'name'	=> __( 'Guest Author', 'co-authors-plus' ) . ' ' . $field['label'],
+				'value'	=> $value,
+			);
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Metabox for saving or updating a Guest Author Social settings
 	 */
 	function metabox_manage_guest_author_social() {
@@ -222,7 +260,7 @@ class CoAuthors_Plus_Social_Pack {
 			} else {
 				echo '<input type="text" name="' . esc_attr( $pm_key ) . '" value="' . esc_attr( $value ) . '" class="regular-text" ' . disabled( $disabled, true, false ) . ' />';
 			}
-			
+
 			echo '</td></tr>';
 		}
 
@@ -231,7 +269,7 @@ class CoAuthors_Plus_Social_Pack {
 
 	/**
 	 * Strip the @ from Twitter usernames for consistency
-	 * 
+	 *
 	 * @param  string $twitter_username The Twitter username to sanitize
 	 * @return string                   The sanitized Twitter username, with @ removed
 	 */
