@@ -233,7 +233,7 @@ class CoAuthors_Plus_Social_Pack {
 			}
 
 			$data[] = array(
-				'name'	=> __( 'Guest Author', 'co-authors-plus' ) . ' ' . $field['label'],
+				'name'	=> $field['label'],
 				'value'	=> $value,
 			);
 		}
