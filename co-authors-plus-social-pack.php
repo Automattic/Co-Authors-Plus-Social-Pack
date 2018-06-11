@@ -209,6 +209,8 @@ class CoAuthors_Plus_Social_Pack {
 	 */
 	function filter_export_extra_data( $data, $author_id ) {
 		$fields = $this->coauthors_plus->guest_authors->get_guest_author_fields( 'social' );
+
+		// Ignoring not personal data fields
 		$ignore_fields = array(
 			'enable_twitter_via',
 			'enable_twitter_related',
