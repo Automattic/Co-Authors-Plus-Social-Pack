@@ -40,14 +40,14 @@ class CoAuthors_Plus_Social_Pack {
 			add_action( 'admin_notices', array( $this, 'action_admin_notices_missing_coauthors_plus' ) );
 		}
 
-		add_filter( 'jetpack_sharing_twitter_via', 		           array( $this, 'filter_jetpack_sharing_twitter_via' ), 		10, 2 );
-		add_filter( 'jetpack_sharing_twitter_related', 	           array( $this, 'filter_jetpack_sharing_twitter_related' ), 	10, 2 );
+		add_filter( 'jetpack_sharing_twitter_via',				   array( $this, 'filter_jetpack_sharing_twitter_via' ),	 10, 2 );
+		add_filter( 'jetpack_sharing_twitter_related',			   array( $this, 'filter_jetpack_sharing_twitter_related' ), 10, 2 );
 
-		add_filter( 'coauthors_guest_author_fields', 	           array( $this, 'filter_coauthors_guest_author_fields' ), 	    10, 2 );
+		add_filter( 'coauthors_guest_author_fields',			   array( $this, 'filter_coauthors_guest_author_fields' ),	 10, 2 );
 
-		add_action( 'add_meta_boxes', 					           array( $this, 'action_add_meta_boxes' ), 					20, 2 );
+		add_action( 'add_meta_boxes',							   array( $this, 'action_add_meta_boxes' ),					 20, 2 );
 
-        add_filter( 'coauthors_guest_author_personal_export_data', array( $this, 'filter_export_extra_data' ),                  10, 2 );
+		add_filter( 'coauthors_guest_author_personal_export_data', array( $this, 'filter_export_extra_data' ),				 10, 2 );
 	}
 
 	/**
@@ -219,12 +219,16 @@ class CoAuthors_Plus_Social_Pack {
 		}
 
 		foreach( $fields as $field ) {
-			if ( in_array( $field['key'], $ignore_fields ) ) continue;
+			if ( in_array( $field['key'], $ignore_fields ) ) {
+				continue;
+			}
 
 			$key = $this->coauthors_plus->guest_authors->get_post_meta_key( $field['key'] );
 			$value = get_post_meta( $author_id, $key, true );
 
-			if ( empty( $value ) ) continue;
+			if ( empty( $value ) ) {
+				continue;
+			}
 
 			$data[] = array(
 				'name'	=> __( 'Guest Author', 'co-authors-plus' ) . ' ' . $field['label'],
