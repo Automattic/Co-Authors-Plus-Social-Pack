@@ -1,3 +1,5 @@
+[![Run PHPUnit and PHPCS](https://github.com/Automattic/Co-Authors-Plus-Social-Pack/actions/workflows/integrate.yml/badge.svg)](https://github.com/Automattic/Co-Authors-Plus-Social-Pack/actions/workflows/integrate.yml)
+
 Co-Authors-Plus-Social-Pack
 ===========================
 
