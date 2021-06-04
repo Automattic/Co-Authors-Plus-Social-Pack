@@ -124,9 +124,21 @@ class CoAuthors_Plus_Social_Pack {
 		if ( ! is_array( $coauthors ) || empty( $coauthors ) )
 			return $related;
 
+		$via = '';
+
+		// Determine the `via` value being used by Jetpack to avoid double-suggesting the first author's account.
+		if ( class_exists( 'Share_Twitter' ) && method_exists( 'Share_Twitter', 'sharing_twitter_via' ) ) {
+			$via = Share_Twitter::sharing_twitter_via( $post_id );
+		}
+
 		foreach ( $coauthors as $coauthor ) {
-			if ( ! isset( $coauthor->twitter ) || empty( $coauthor->twitter ) || ! (int) $coauthor->enable_twitter_related )
+			if ( ! isset( $coauthor->twitter ) || empty( $coauthor->twitter ) || ! (int) $coauthor->enable_twitter_related ) {
 				continue;
+			}
+
+			if ( $via === $coauthor->twitter ) {
+				continue;
+			}
 
 			$related[ $coauthor->twitter ] = $coauthor->description;
 		}
