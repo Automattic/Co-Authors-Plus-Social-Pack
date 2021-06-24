@@ -31,7 +31,7 @@ class CoAuthors_Plus_Social_Pack {
 	 *
 	 * Performs general initialization, such as registering the needed filters
 	 */
-	function __construct(){
+	function __construct() {
 		global $coauthors_plus;
 
 		if ( $coauthors_plus instanceof coauthors_plus ) {
@@ -40,25 +40,27 @@ class CoAuthors_Plus_Social_Pack {
 			add_action( 'admin_notices', array( $this, 'action_admin_notices_missing_coauthors_plus' ) );
 		}
 
-		add_filter( 'jetpack_sharing_twitter_via',						 array( $this, 'filter_jetpack_sharing_twitter_via' ),	 10, 2 );
-		add_filter( 'jetpack_sharing_twitter_related',					 array( $this, 'filter_jetpack_sharing_twitter_related' ), 10, 2 );
+		add_filter( 'jetpack_sharing_twitter_via', array( $this, 'filter_jetpack_sharing_twitter_via' ), 10, 2 );
+		add_filter( 'jetpack_sharing_twitter_related', array( $this, 'filter_jetpack_sharing_twitter_related' ), 10, 2 );
 
-		add_filter( 'coauthors_guest_author_fields',					 array( $this, 'filter_coauthors_guest_author_fields' ),	 10, 2 );
+		add_filter( 'coauthors_guest_author_fields', array( $this, 'filter_coauthors_guest_author_fields' ), 10, 2 );
 
-		add_action( 'add_meta_boxes',									 array( $this, 'action_add_meta_boxes' ),					 20, 2 );
+		add_action( 'add_meta_boxes', array( $this, 'action_add_meta_boxes' ), 20, 2 );
 
-		add_filter( 'coauthors_guest_author_personal_export_extra_data', array( $this, 'filter_export_extra_data' ),				 10, 2 );
+		add_filter( 'coauthors_guest_author_personal_export_extra_data', array( $this, 'filter_export_extra_data' ), 10, 2 );
 	}
 
 	/**
 	 * Register the metaboxes used for Guest Authors Social settings
 	 */
 	function action_add_meta_boxes() {
-		if ( ! $this->coauthors_plus instanceof coauthors_plus || ! $this->coauthors_plus->guest_authors instanceof CoAuthors_Guest_Authors )
+		if ( ! $this->coauthors_plus instanceof coauthors_plus || ! $this->coauthors_plus->guest_authors instanceof CoAuthors_Guest_Authors ) {
 			return;
+		}
 
-		if ( get_post_type() == $this->coauthors_plus->guest_authors->post_type )
+		if ( get_post_type() == $this->coauthors_plus->guest_authors->post_type ) {
 			add_meta_box( 'coauthors-manage-guest-author-social', __( 'Social', 'co-authors-plus' ), array( $this, 'metabox_manage_guest_author_social' ), $this->coauthors_plus->guest_authors->post_type, 'normal', 'default' );
+		}
 	}
 
 	/**
@@ -82,21 +84,24 @@ class CoAuthors_Plus_Social_Pack {
 	 * enabled
 	 *
 	 * @param  string $via The Twitter username to label the Tweet as 'from'
-	 * @param  int $post_id The post id for the post being shared
+	 * @param  int    $post_id The post id for the post being shared
 	 * @return string The Twitter username to use in 'via' instead
 	 */
 	public function filter_jetpack_sharing_twitter_via( $via, $post_id ) {
-		if ( ! function_exists( 'get_coauthors' ) )
+		if ( ! function_exists( 'get_coauthors' ) ) {
 			return $via;
+		}
 
 		$coauthors = get_coauthors( $post_id );
 
-		if ( ! is_array( $coauthors ) || empty( $coauthors ) )
+		if ( ! is_array( $coauthors ) || empty( $coauthors ) ) {
 			return $via;
+		}
 
 		foreach ( $coauthors as $coauthor ) {
-			if ( ! isset( $coauthor->twitter ) || empty( $coauthor->twitter ) || ! (int) $coauthor->enable_twitter_via )
+			if ( ! isset( $coauthor->twitter ) || empty( $coauthor->twitter ) || ! (int) $coauthor->enable_twitter_via ) {
 				continue;
+			}
 
 			return $coauthor->twitter;
 		}
@@ -112,17 +117,19 @@ class CoAuthors_Plus_Social_Pack {
 	 * gives us the ability to tell Twitter exactly which accounts to suggest - in this case, the post's Authors
 	 *
 	 * @param  array $related Array of related Twitter usernames
-	 * @param  int $post_id The id of the post being shared
+	 * @param  int   $post_id The id of the post being shared
 	 * @return array The array of Twitter usernames to suggest as related / recommended
 	 */
 	public function filter_jetpack_sharing_twitter_related( $related, $post_id ) {
-		if ( ! function_exists( 'get_coauthors' ) )
+		if ( ! function_exists( 'get_coauthors' ) ) {
 			return $related;
+		}
 
 		$coauthors = get_coauthors( $post_id );
 
-		if ( ! is_array( $coauthors ) || empty( $coauthors ) )
+		if ( ! is_array( $coauthors ) || empty( $coauthors ) ) {
 			return $related;
+		}
 
 		$via = '';
 
@@ -155,56 +162,56 @@ class CoAuthors_Plus_Social_Pack {
 	 * @return array                   The filtered array of fields
 	 */
 	public function filter_coauthors_guest_author_fields( $fields_to_return, $groups ) {
-		if ( 'social' === $groups[0] || 'all' === $groups[0] ){
+		if ( 'social' === $groups[0] || 'all' === $groups[0] ) {
 			$fields_to_return['twitter'] = array(
-				'key'      			=> 'twitter',
-				'label'    			=> __( 'Twitter Username', 'co-authors-plus' ),
-				'group'    			=> 'social',
-				'sanitize_function'	=> array( $this, 'sanitize_twitter' )
+				'key'               => 'twitter',
+				'label'             => __( 'Twitter Username', 'co-authors-plus' ),
+				'group'             => 'social',
+				'sanitize_function' => array( $this, 'sanitize_twitter' ),
 			);
 
-			$sharing_disabled 				= false;
-			$requires_jetpack_message 		= '';
+			$sharing_disabled         = false;
+			$requires_jetpack_message = '';
 
-			$enable_twitter_via_label 		= __( 'Attribute Twitter Shares to Author', 'co-authors-plus' );
-			$enable_twitter_related_label	= __( 'Show Author as \'Related\' in Twitter Shares', 'co-authors-plus' );
+			$enable_twitter_via_label     = __( 'Attribute Twitter Shares to Author', 'co-authors-plus' );
+			$enable_twitter_related_label = __( 'Show Author as \'Related\' in Twitter Shares', 'co-authors-plus' );
 
 			if ( ! class_exists( 'Jetpack' ) ) {
-				$sharing_disabled 				= true;
-				$requires_jetpack_message 		= __( '(Requires Jetpack)' );
+				$sharing_disabled         = true;
+				$requires_jetpack_message = __( '(Requires Jetpack)' );
 
-				$enable_twitter_via_label 		.= ' ' . $requires_jetpack_message;
-				$enable_twitter_related_label 	.= ' ' . $requires_jetpack_message;
+				$enable_twitter_via_label     .= ' ' . $requires_jetpack_message;
+				$enable_twitter_related_label .= ' ' . $requires_jetpack_message;
 			}
 
 			$fields_to_return['enable_twitter_via'] = array(
-				'key'      			=> 'enable_twitter_via',
-				'label'    			=>  $enable_twitter_via_label,
-				'type'				=> 'checkbox',
-				'group'    			=> 'social',
-				'disabled'			=> $sharing_disabled,
-				'sanitize_function'	=> 'intval'
+				'key'               => 'enable_twitter_via',
+				'label'             => $enable_twitter_via_label,
+				'type'              => 'checkbox',
+				'group'             => 'social',
+				'disabled'          => $sharing_disabled,
+				'sanitize_function' => 'intval',
 			);
 
 			$fields_to_return['enable_twitter_related'] = array(
-				'key'      			=> 'enable_twitter_related',
-				'label'    			=> $enable_twitter_related_label,
-				'type'				=> 'checkbox',
-				'group'    			=> 'social',
-				'disabled'			=> $sharing_disabled,
-				'sanitize_function'	=> 'intval'
+				'key'               => 'enable_twitter_related',
+				'label'             => $enable_twitter_related_label,
+				'type'              => 'checkbox',
+				'group'             => 'social',
+				'disabled'          => $sharing_disabled,
+				'sanitize_function' => 'intval',
 			);
 
 			$fields_to_return['facebook'] = array(
-				'key'      			=> 'facebook',
-				'label'    			=> __( 'Facebook', 'co-authors-plus' ),
-				'group'    			=> 'social'
+				'key'   => 'facebook',
+				'label' => __( 'Facebook', 'co-authors-plus' ),
+				'group' => 'social',
 			);
 
 			$fields_to_return['google_plus'] = array(
-				'key'      			=> 'google_plus',
-				'label'    			=> __( 'Google+', 'co-authors-plus' ),
-				'group'    			=> 'social'
+				'key'   => 'google_plus',
+				'label' => __( 'Google+', 'co-authors-plus' ),
+				'group' => 'social',
 			);
 		}
 
@@ -229,15 +236,15 @@ class CoAuthors_Plus_Social_Pack {
 		);
 
 		if ( ! is_array( $data ) ) {
-			$data = [];
+			$data = array();
 		}
 
-		foreach( $fields as $field ) {
+		foreach ( $fields as $field ) {
 			if ( in_array( $field['key'], $ignore_fields ) ) {
 				continue;
 			}
 
-			$key = $this->coauthors_plus->guest_authors->get_post_meta_key( $field['key'] );
+			$key   = $this->coauthors_plus->guest_authors->get_post_meta_key( $field['key'] );
 			$value = get_post_meta( $author_id, $key, true );
 
 			if ( empty( $value ) ) {
@@ -245,8 +252,8 @@ class CoAuthors_Plus_Social_Pack {
 			}
 
 			$data[] = array(
-				'name'	=> $field['label'],
-				'value'	=> $value,
+				'name'  => $field['label'],
+				'value' => $value,
 			);
 		}
 
@@ -263,11 +270,11 @@ class CoAuthors_Plus_Social_Pack {
 
 		echo '<table class="form-table"><tbody>';
 
-		foreach( $fields as $field ) {
-			$pm_key 	= $this->coauthors_plus->guest_authors->get_post_meta_key( $field['key'] );
-			$value 		= get_post_meta( $post->ID, $pm_key, true );
-			$type 		= isset( $field['type'] ) ? $field['type'] : 'text';
-			$disabled 	= isset( $field['disabled'] ) ? ( (bool) $field['disabled'] ) : false;
+		foreach ( $fields as $field ) {
+			$pm_key   = $this->coauthors_plus->guest_authors->get_post_meta_key( $field['key'] );
+			$value    = get_post_meta( $post->ID, $pm_key, true );
+			$type     = isset( $field['type'] ) ? $field['type'] : 'text';
+			$disabled = isset( $field['disabled'] ) ? ( (bool) $field['disabled'] ) : false;
 
 			echo '<tr><th>';
 			echo '<label for="' . esc_attr( $pm_key ) . '">' . esc_html( $field['label'] ) . '</label>';
